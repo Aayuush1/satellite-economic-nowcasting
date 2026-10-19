@@ -1,4 +1,30 @@
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
 
+# Python Bytecode & Cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
 
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Environment Variables & Secrets
+.env
+*.env
+credentials.json
+*-key.json
+
+# IDEs & System Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
