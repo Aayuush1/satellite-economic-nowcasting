@@ -1,0 +1,34 @@
+project:
+  name: "satellite-economic-nowcasting"
+  target_country: "Nigeria"
+  admin0_code: "NGA"
+  gee_project_id: "satellite-economic-nowcasting"
+
+data:
+  reference_year: 2023
+  panel_years: [2018, 2019, 2020, 2021, 2022, 2023]
+  paths:
+    processed_dir: "data/processed"
+    raw_dir: "data/raw"
+    docs_dir: "docs"
+
+sensors:
+  viirs:
+    asset: "NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG"
+    band: "avg_rad"
+    aggregation: "median"
+  modis:
+    asset: "MODIS/061/MOD13Q1"
+    band: "NDVI"
+    multiplier: 0.0001
+  sentinel2:
+    asset: "COPERNICUS/S2_SR_HARMONIZED"
+    dry_season_window: ["01-01", "04-30"]
+    cloud_threshold: 20
+
+models:
+  baseline: "ols"
+  spatial_cv: "leave_one_geopolitical_zone_out"
+  ridge_alpha: 1.0
+  rf_n_estimators: 100
+  rf_max_depth: 3
