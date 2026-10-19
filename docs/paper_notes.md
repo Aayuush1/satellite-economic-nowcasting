@@ -148,3 +148,88 @@ This paper investigates whether standard transfer learning pipelines can accurat
 ### Open Questions
 - **Sensor Resolution Bottlenecks:** Can 10-meter to 30-meter public satellites detect subtle livelihood improvements in developing regions without auxiliary mobility or commercial high-resolution data?
 - **Atmospheric & Sensor Drift Normalization:** How do we separate real temporal decline in economic activity from optical sensor degradation or inter-annual cloud-cover artifacts in multi-year composites?
+
+---
+
+
+# Research Notes: Subnational Economic Nowcasting via Multi-Sensor Earth Observation
+
+## 1. Mathematical Formulation
+
+### 1.1 Remote Sensing Feature Space
+Let $i \in \{1, \dots, N\}$ index administrative regions (States $N=37$, LGAs $N=775$) and $t$ index temporal years. The primary feature vectors extracted via Google Earth Engine zonal reductions are defined as:
+
+1. **Nighttime Luminosity:**
+   $$\text{log\_viirs}_{i,t} = \ln\left(1 + \frac{1}{|A_i|} \sum_{p \in A_i} \text{VIIRS}_{p,t}\right)$$
+   where $\text{VIIRS}_{p,t}$ represents the annual median Day/Night Band (DNB) radiance ($nW \cdot cm^{-2} \cdot sr^{-1}$) over spatial footprint $A_i$.
+
+2. **Normalized Difference Vegetation Index (MODIS 250m):**
+   $$\text{NDVI}_{i,t} = \frac{1}{|A_i|} \sum_{p \in A_i} \left( \frac{\text{NIR}_{p,t} - \text{Red}_{p,t}}{\text{NIR}_{p,t} + \text{Red}_{p,t}} \right)$$
+
+3. **Sentinel-2 L2A BOA Multi-Spectral Indices (10m–20m):**
+   * **Normalized Difference Built-Up Index (NDBI):**
+     $$\text{NDBI} = \frac{\text{SWIR1} - \text{NIR}}{\text{SWIR1} + \text{NIR}} = \frac{B_{11} - B_8}{B_{11} + B_8}$$
+   * **Modified Normalized Difference Water Index (MNDWI):**
+     $$\text{MNDWI} = \frac{\text{Green} - \text{SWIR1}}{\text{Green} + \text{SWIR1}} = \frac{B_3 - B_{11}}{B_3 + B_{11}}$$
+   * **Bare Soil Index (BSI):**
+     $$\text{BSI} = \frac{(B_{11} + B_4) - (B_8 + B_2)}{(B_{11} + B_4) + (B_8 + B_2)}$$
+
+---
+
+## 2. Spatial Econometric Specification
+
+### 2.1 Queen Contiguity Weight Matrix ($W$)
+To account for geographic proximity across contiguous subnational boundaries:
+$$w_{ij} = \begin{cases} 1 & \text{if } \text{bnd}(i) \cap \text{bnd}(j) \neq \emptyset, \, i \neq j \\ 0 & \text{otherwise} \end{cases}$$
+Row-standardized transformation:
+$$W_{ij}^* = \frac{w_{ij}}{\sum_{k=1}^N w_{ik}}$$
+
+### 2.2 Global Moran's $I$ Test
+Spatial autocorrelation of the poverty headcount vector $y$ is computed as:
+$$I = \frac{N}{\sum_{i=1}^N \sum_{j=1}^N W_{ij}^*} \frac{\sum_{i=1}^N \sum_{j=1}^N W_{ij}^*(y_i - \bar{y})(y_j - \bar{y})}{\sum_{i=1}^N (y_i - \bar{y})^2}$$
+* **Empirical Result:** $I = 0.7337$, $\mathbb{E}[I] = -0.0278$, $z = 6.42$, $p < 0.00001$.
+* **Conclusion:** Rejection of the null hypothesis ($H_0$: spatial randomness). Poverty displays intense positive spatial clustering across Nigeria.
+
+### 2.3 Spatial Autoregressive Model (SAR / 2SLS)
+To capture spatial lag spillovers while overcoming endogeneity ($\text{Cov}(Wy, \epsilon) \neq 0$), we estimate the model using Spatial Two-Stage Least Squares (2SLS) instrumented by $[WX, W^2X]$:
+$$y = \rho W y + X \beta + \epsilon$$
+
+**Empirical Estimates:**
+* Constant: $\alpha = 133.33$ ($p = 0.00003$)
+* $\log(\text{VIIRS})$: $\beta_1 = -38.87$ ($z = -5.24, p < 0.00001$)
+* MODIS NDVI: $\beta_2 = -159.76$ ($z = -3.80, p = 0.00015$)
+* Spatial Lag ($\rho$): $\rho = 0.1823$ ($z = 0.89, p = 0.373$)
+* **Model Pseudo $R^2$:** $0.8633$
+* **Anselin-Kelejian Test:** Value $= 0.016$, $p = 0.9000$ (No remaining spatial error dependence).
+
+---
+
+## 3. Panel Dynamics & Structural Shocks (2018–2023)
+
+### 3.1 Entity Fixed Effects Estimation
+For balanced panel data ($N=37, T=6, NT=222$):
+$$y_{it} = \mu_i + \beta X_{it} + \epsilon_{it}$$
+where $\mu_i$ absorbs all time-invariant, unobserved state structural fixed effects (topography, coastlines, capital endowment).
+
+* **Poolability Test:** $F(36, 184) = 89.04$ ($p < 0.00001$), formally rejecting naive pooled OLS.
+
+### 3.2 The Niger Delta Hydrocarbon / Flaring Discontinuity
+Panel trajectory analysis between 2018 and 2023 reveals an atypical decline in nighttime radiance across the South-South geopolitical zone:
+* Bayelsa: $-55.4\%$
+* Akwa Ibom: $-42.8\%$
+* Delta: $-33.9\%$
+* Rivers: $-31.4\%$
+
+**Qualitative Context:** Unlike agrarian or commercial states where night lights directly correlate with household grid electrification, Niger Delta radiance is dominated by upstream industrial gas flaring terminals. Flare capture initiatives and pipeline interruptions produce sharp radiance contractions that reflect hydrocarbon operational shifts rather than sudden drops in household welfare.
+
+---
+
+## 4. Cross-Validation Protocols
+
+Standard $K$-Fold cross-validation suffers from spatial data leakage due to spatial autocorrelation ($I = 0.7337$). To guarantee generalization across unobserved geographical domains, we adopt **Spatial Leave-One-Geopolitical-Zone-Out Cross-Validation**:
+
+$$\text{Test Sets } Z \in \{\text{North Central}, \text{North East}, \text{North West}, \text{South East}, \text{South South}, \text{South West}\}$$
+
+* **Spatial CV $R^2$:** $0.805$ – $0.810$
+* **Spatial CV RMSE:** $\sim 10.6\%$ points
+* **Spatial CV MAE:** $\sim 8.4\%$ points
