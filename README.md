@@ -106,7 +106,7 @@ Subnational surveys (e.g., National Bureau of Statistics / Multidimensional Pove
 
 ---
 
-## 4. Setup and Quickstart
+## 5. Setup and Quickstart
 
 ### Prerequisites
 
@@ -149,7 +149,7 @@ python main.py --run-all
 
 ---
 
-## 5. Citation
+## 6. Citation
 
 If you use this codebase, methodology, or nowcasted subnational datasets in your research or applications, please cite:
 
@@ -166,6 +166,6 @@ If you use this codebase, methodology, or nowcasted subnational datasets in your
 
 ---
 
-## 6. License
+## 7. License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
