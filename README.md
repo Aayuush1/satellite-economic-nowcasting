@@ -2,15 +2,15 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-API-green.svg)](https://earthengine.google.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A reproducible, production-grade remote sensing and spatial econometric pipeline to nowcast subnational economic welfare (poverty headcount rates) across Nigeria's **37 Admin-1 States** and **775 Admin-2 Local Government Areas (LGAs)** using multi-sensor Earth Observation (EO) data.
+An open-source research pipeline and econometric framework to nowcast subnational economic welfare (poverty headcount rates) across Nigeria's **37 Admin-1 States** and **775 Admin-2 Local Government Areas (LGAs)** using multi-sensor Earth Observation (EO) data.
 
 ---
 
 ## 1. Methodological Architecture
 
-Subnational surveys (e.g., National Bureau of Statistics / Multidimensional Poverty Index) are costly, infrequent, and rarely available at fine administrative granularities. This pipeline bridges this gap by fusing multi-sensor satellite imagery with spatial econometric models:
+Subnational surveys (e.g., National Bureau of Statistics / Multidimensional Poverty Index) are costly, infrequent, and rarely available at fine administrative granularities. This pipeline explores bridging this gap by fusing multi-sensor satellite imagery with spatial econometric baselines:
 
 ```text
 +-----------------------------------------------------------------------------------+
@@ -19,26 +19,26 @@ Subnational surveys (e.g., National Bureau of Statistics / Multidimensional Pove
 |  - MODIS Terra MOD13Q1 (16-Day NDVI Annual Mean, 250m)                            |
 |  - Copernicus Sentinel-2 L2A (Dry-Season BOA Reflectance: NDBI, MNDWI, BSI, 10m)  |
 +-----------------------------------------------------------------------------------+
-                                        |
-                                        v
+                                          |
+                                          v
 +-----------------------------------------------------------------------------------+
 |                           Server-Side Spatial Reduction                           |
 |  - FAO GAUL Level-1 (37 States) & Level-2 (775 LGAs)                              |
 +-----------------------------------------------------------------------------------+
-                                        |
-                                        v
+                                          |
+                                          v
 +-----------------------------------------------------------------------------------+
 |                        Econometric & Machine Learning Engine                      |
 |  - Spatial Leave-One-Geopolitical-Zone-Out Cross-Validation                       |
-|  - OLS, Ridge, Random Forest Baselines (R² ≈ 0.81 under Spatial CV)               |
+|  - Calibrated Linear / Spatial Baselines (R² ≈ 0.81 under Spatial CV)             |
 |  - Spatial Lag Model (SAR via Queen Contiguity W, Moran's I = 0.734, p < 0.0001)  |
 |  - Balanced Panel Fixed Effects Estimation (2018–2023, N=37, T=6)                 |
 +-----------------------------------------------------------------------------------+
-                                        |
-                                        v
+                                          |
+                                          v
 +-----------------------------------------------------------------------------------+
 |                                 Delivery & Outputs                                |
-|  - Subnational 775-LGA Economic Welfare Predictions                               |
+|  - Subnational 775-LGA Economic Welfare Proxy Predictions                         |
 |  - Interactive Web GIS Choropleth (Leaflet / Folium + VIIRS Tile Layers)          |
 +-----------------------------------------------------------------------------------+
 ```
@@ -55,11 +55,19 @@ Subnational surveys (e.g., National Bureau of Statistics / Multidimensional Pove
    * **Spatial Leave-One-Geopolitical-Zone-Out CV:** The multi-sensor model achieves a spatial out-of-region $R^2 \approx 0.81$ with an RMSE of $\sim 10.6$ percentage points.
 3. **Macro Structural Shifts (Panel 2018–2023):**
    * Panel fixed-effects models reject naive pooling ($F = 89.04, p < 0.0001$).
-   * Captures major structural shocks, notably gas flaring reduction mandates in the Niger Delta (Bayelsa $-55\%$, Akwa Ibom $-42\%$).
+   * Captures major shifts in nighttime luminosity in oil-producing coastal states (e.g., Bayelsa $-55\%$, Akwa Ibom $-42\%$), temporally coincident with national gas flare commercialization policies.
 
 ---
 
-## 3. Repository Structure
+## 3. Important Methodological Caveats
+
+* **Ground-Truth Calibration Boundary:** Official poverty headcount figures (NBS) exist at the Admin-1 State level. Consequently, the 775 Admin-2 (LGA) predictions are model-derived downscaled proxy estimates, not directly validated against local ground surveys.
+* **Causal Attribution:** Structural radiance shifts observed in the Niger Delta correspond chronologically to environmental policy adjustments, but represent observational associations rather than causally verified econometric impacts.
+* **Research Prototype:** This repository serves as an interpretable spatial econometric benchmark rather than an operational commercial deployment.
+
+---
+
+## 4. Repository Structure
 
 ```text
 ├── config/
@@ -89,8 +97,11 @@ Subnational surveys (e.g., National Bureau of Statistics / Multidimensional Pove
 │   │   └── spatial_econometrics.py
 │   └── visualization/              # Folium web GIS rendering
 │       └── visualize_lga_map.py
+├── .gitignore                      # Git exclusion rules
+├── LICENSE                         # MIT License
 ├── main.py                         # Unified master CLI orchestrator
-└── requirements.txt                # Pinned virtual environment dependencies
+├── requirements.txt                # Curated dependency manifest
+└── test_setup.py                   # Environment setup test
 ```
 
 ---
@@ -148,7 +159,8 @@ If you use this codebase, methodology, or nowcasted subnational datasets in your
   title        = {Remote Sensing Economic Nowcasting Pipeline (Nigeria Admin-1 & Admin-2)},
   year         = {2026},
   publisher    = {GitHub},
-  howpublished = {\url{https://github.com/Aayuush1/satellite-economic-nowcasting}}
+  journal      = {GitHub repository},
+  howpublished = {\url{[https://github.com/Aayuush1/satellite-economic-nowcasting](https://github.com/Aayuush1/satellite-economic-nowcasting)}}
 }
 ```
 
