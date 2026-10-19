@@ -160,7 +160,7 @@ If you use this codebase, methodology, or nowcasted subnational datasets in your
   year         = {2026},
   publisher    = {GitHub},
   journal      = {GitHub repository},
-  howpublished = {\url{[https://github.com/Aayuush1/satellite-economic-nowcasting](https://github.com/Aayuush1/satellite-economic-nowcasting)}}
+  howpublished = {\url{https://github.com/Aayuush1/satellite-economic-nowcasting}}}
 }
 ```
 
