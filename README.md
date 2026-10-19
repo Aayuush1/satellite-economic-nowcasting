@@ -135,3 +135,25 @@ python main.py --nowcast-lga --visualize
 # Execute full pipeline end-to-end
 python main.py --run-all
 ```
+
+---
+
+## 5. Citation
+
+If you use this codebase, methodology, or nowcasted subnational datasets in your research or applications, please cite:
+
+```bibtex
+@software{aayush2026satellite,
+  author       = {Aayush},
+  title        = {Remote Sensing Economic Nowcasting Pipeline (Nigeria Admin-1 & Admin-2)},
+  year         = {2026},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/Aayuush1/satellite-economic-nowcasting}}
+}
+```
+
+---
+
+## 6. License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
